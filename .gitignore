@@ -1,0 +1,12 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+/.idea
+*.iml
+/*.iml
+
+*/node_modules/
+*/package-lock.json
+*/build/
+*/dist/
+
+*/src/react-app-env.d.ts

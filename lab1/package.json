@@ -1,0 +1,10 @@
+{
+  "name": "lab1",
+  "version": "1.0.0",
+  "dependencies": {
+    "@types/mathjs": "^6.0.5",
+    "line-reader": "^0.4.0",
+    "mathjs": "^6.6.1",
+    "wait-console-input": "^0.1.7"
+  }
+}
