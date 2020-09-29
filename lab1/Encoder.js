@@ -1,41 +1,30 @@
-const Math = require("mathjs");
-const LineByLine = require("n-readlines");
+import math from "mathjs"
 
-const matrixHPath = "matrixH.txt";
-const matrixGPath = "matrixG.txt";
-const vectorAPath = "vectorA.txt";
+export class Encoder {
+	/**
+	 * @param encodingMatrix: Array<Array<number>> | Matrix
+	 */
+	constructor(encodingMatrix) {
+		this.encodingMatrix = encodingMatrix;
+	}
 
-function lineToArray(line) {
-	let inputArray = line.split(' ');
-	for (let index = 0; index < inputArray.length; index++) {
-		const element = inputArray[index];
-		if (isNaN(parseInt(element, 10))) {
-			console.log('Wrong input entered');
+	/**
+	 * c = a * G, where a - bit array, G - encoding matrix
+	 * @param bitArray: Array<number | boolean>
+	 * @returns Array<number>
+	 */
+	encode(bitArray) {
+		// split into 4-bit arrays
+		const fourBitArrays = [];
+		for (let i = 0; i < bitArray.length - 4; i += 4) {
+			fourBitArrays.push(bitArray.slice(i, i + 4));
 		}
-	}
-	return inputArray.map(item => +item);
-}
 
-function readMatrix(matrixFilePath) {
-	const lineReader = new LineByLine(matrixFilePath);
-	let line;
-	let matrix = [];
+		// encode each of them
+		const encodedFourBitArrays = fourBitArrays.map(array => math.mod(math.multiply(array, this.encodingMatrix), 2));
 
-	while (line = lineReader.next()) {
-		console.log(line);
-		matrix.push(lineToArray(line.toString("ascii")));
+		// concat all the arrays with encoded data
+		return encodedFourBitArrays.flat();
 	}
 
-	return Math.matrix(matrix);
 }
-
-let matrixH = readMatrix(matrixHPath);
-let matrixG = readMatrix(matrixGPath);
-let vectorA = readMatrix(vectorAPath);
-
-console.log("H", matrixH);
-console.log("G", matrixG);
-console.log("a", vectorA);
-
-let vectorC = Math.multiply(vectorA, matrixG);
-console.log("c", vectorC);
