@@ -24,7 +24,7 @@ export class CyclicCodes {
 	 * @returns number[]
 	 */
 	encode(a) {
-		return CyclicCodes.#multPolynomes(a, this.g).slice(0, this.n);
+		return CyclicCodes.#multPolynomes(a, this.g).slice(0, this.n).map(value => math.mod(value, 2));
 	}
 
 	/**
@@ -33,7 +33,7 @@ export class CyclicCodes {
 	 * @returns number[]
 	 */
 	findRemainder(c) {
-		return CyclicCodes.#dividePolynomesWithRemainder(c, this.g).remainder;
+		return CyclicCodes.#dividePolynomesWithRemainder(c, this.g).remainder.map(value => math.mod(value, 2));
 	}
 
 	/**
@@ -91,7 +91,7 @@ export class CyclicCodes {
 
 const cyclicCodes = new CyclicCodes();
 
-const a = [0, 0, 0, 1];
+const a = [1, 0, 0, 1];
 const c =  cyclicCodes.encode(a);
 const r = cyclicCodes.findRemainder(c);
 const c2 = cyclicCodes.encodeSys(a);
