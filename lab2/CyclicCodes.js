@@ -3,10 +3,9 @@ import math from "mathjs";
 export class CyclicCodes {
 
 	/**
-	 *
 	 * @param k: number (integer)
 	 * @param n: number (integer)
-	 * @param g: number[]
+	 * @param g: number[] (integer)
 	 * @param t: number (integer)
 	 * @param L: number (integer)
 	 */
@@ -16,6 +15,7 @@ export class CyclicCodes {
 		this.g = g;
 		this.t = t;
 		this.L = L;
+		this.syndromeTable = this.generateSyndromeTable();
 	}
 
 	/**
@@ -24,7 +24,9 @@ export class CyclicCodes {
 	 * @returns number[]
 	 */
 	encode(a) {
-		return CyclicCodes.#multPolynomes(a, this.g).slice(0, this.n).map(value => math.mod(value, 2));
+		return CyclicCodes.#multPolynomials(a, this.g)
+			.slice(0, this.n)
+			.map(value => math.mod(value, 2));
 	}
 
 	/**
@@ -33,7 +35,8 @@ export class CyclicCodes {
 	 * @returns number[]
 	 */
 	findRemainder(c) {
-		return CyclicCodes.#dividePolynomesWithRemainder(c, this.g).remainder.map(value => math.mod(value, 2));
+		return CyclicCodes.#dividePolynomialsWithRemainder(c, this.g).remainder
+			.map(value => math.mod(value, 2));
 	}
 
 	/**
@@ -49,14 +52,39 @@ export class CyclicCodes {
 	}
 
 	/**
+	 * @returns {{}}
+	 */
+	generateSyndromeTable() {
+		const syndromes = {};
+		for (let error = 0; error < math.pow(2, this.n); ++error) {
+			if (CyclicCodes.#hammingWeight(error) <= this.t) {
+				const c = Array.from(error.toString(2))
+					.map(value => Number.parseInt(value));
+
+				c.unshift(...new Array(this.n - c.length).fill(0));
+
+				const syndrome = this.findRemainder(c)
+					.reduce((str, value) => str.concat(value.toString()), "");
+
+				syndromes[syndrome] = error.toString(2);
+			}
+		}
+		return syndromes;
+	}
+
+	/**
 	 * format: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
 	 * @param dividend: number[]
 	 * @param divisor: number[]
 	 * @returns {{quotient: number[], remainder: number[]}}
 	 */
-	static #dividePolynomesWithRemainder(dividend, divisor) {
+	static #dividePolynomialsWithRemainder(dividend, divisor) {
 		const remainder = [...dividend];
-		const quotient = new Array(dividend.length - divisor.length + 1);
+		const quotientLength = dividend.length - divisor.length + 1;
+		if (quotientLength < 1) {
+			return {quotient: [0], remainder};
+		}
+		const quotient = new Array(quotientLength);
 		for (let i = 0; i < quotient.length; ++i) {
 			let coeff = remainder[remainder.length - i - 1] / divisor[divisor.length - 1];
 			quotient[quotient.length - i - 1] = coeff;
@@ -73,7 +101,7 @@ export class CyclicCodes {
 	 * @param b: number[]
 	 * @returns number[]
 	 */
-	static #multPolynomes(a, b) {
+	static #multPolynomials(a, b) {
 		const R = (a.length - 1) * (b.length - 1);
 		const result = new Array(R).fill(0);
 
@@ -87,15 +115,12 @@ export class CyclicCodes {
 
 		return result;
 	}
+
+	/**
+	 * @param code: number (integer)
+	 * @returns number
+	 */
+	static #hammingWeight(code) {
+		return code.toString(2).replace(/0/g, "").length;
+	}
 }
-
-const cyclicCodes = new CyclicCodes();
-
-const a = [1, 0, 0, 1];
-const c =  cyclicCodes.encode(a);
-const r = cyclicCodes.findRemainder(c);
-const c2 = cyclicCodes.encodeSys(a);
-
-console.log("Task 2. Encoded a:", c);
-console.log("Task 3. Remainder of c:", r);
-console.log("Task 4. Encoded sys a:", c2);
