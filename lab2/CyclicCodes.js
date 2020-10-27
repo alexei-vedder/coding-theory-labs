@@ -1,4 +1,5 @@
 import math from "mathjs";
+import {bitArrayToString, stringToBitArray} from "./Converters.js";
 
 export class CyclicCodes {
 
@@ -7,14 +8,12 @@ export class CyclicCodes {
 	 * @param n: number (integer)
 	 * @param g: number[] (integer)
 	 * @param t: number (integer)
-	 * @param L: number (integer)
 	 */
-	constructor(k = 4, n = 7, g = [1, 0, 1, 1], t = 1, L) {
+	constructor(k = 4, n = 7, g = [1, 0, 1, 1], t = 1) {
 		this.k = k;
 		this.n = n;
 		this.g = g;
 		this.t = t;
-		this.L = L;
 		this.syndromeTable = this.generateSyndromeTable();
 	}
 
@@ -45,7 +44,7 @@ export class CyclicCodes {
 	 * @returns number[]
 	 */
 	encodeSys(a) {
-		const c_ = a.fill(0, 0, this.n - this.k);
+		const c_ = new Array(this.n - this.k).fill(0).concat(...a);
 		const r = this.findRemainder(c_);
 		const c = math.add(c_, r);
 		return c;
@@ -58,14 +57,9 @@ export class CyclicCodes {
 		const syndromes = {};
 		for (let error = 0; error < math.pow(2, this.n); ++error) {
 			if (CyclicCodes.#hammingWeight(error) <= this.t) {
-				const c = Array.from(error.toString(2))
-					.map(value => Number.parseInt(value));
-
+				const c = stringToBitArray(error.toString(2));
 				c.unshift(...new Array(this.n - c.length).fill(0));
-
-				const syndrome = this.findRemainder(c)
-					.reduce((str, value) => str.concat(value.toString()), "");
-
+				const syndrome = bitArrayToString(this.findRemainder(c));
 				syndromes[syndrome] = error.toString(2);
 			}
 		}
@@ -99,7 +93,7 @@ export class CyclicCodes {
 	 * format: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
 	 * @param a: number[]
 	 * @param b: number[]
-	 * @returns number[]
+	 * @returns {number[]}
 	 */
 	static #multPolynomials(a, b) {
 		const R = (a.length - 1) * (b.length - 1);
@@ -118,7 +112,7 @@ export class CyclicCodes {
 
 	/**
 	 * @param code: number (integer)
-	 * @returns number
+	 * @returns {number} (integer)
 	 */
 	static #hammingWeight(code) {
 		return code.toString(2).replace(/0/g, "").length;
