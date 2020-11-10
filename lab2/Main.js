@@ -17,6 +17,9 @@ console.log("Task 5. Syndrome table:", cyclicCodes.generateSyndromeTable());
 console.log("Task 6");
 
 const fsWorker = new JSONFileWorker();
-
 const fileEncoder = new FileEncoder(fsWorker, 7, 15, [1, 0, 0, 0, 1, 0, 1, 1, 1]);
-fileEncoder.encodeFile("in.json", "out.json")
+
+await fileEncoder.encodeFile("in.json", "out.json");
+await fileEncoder.injectError("out.json");
+await fileEncoder.decodeFile("out.json", "decoded.json");
+

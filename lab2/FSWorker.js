@@ -27,12 +27,14 @@ export class JSONFileWorker extends FSWorker {
 	 * @returns {Promise<void>}
 	 */
 	async writeDataToFile(data, path = "out.json") {
-		return new Promise(() => {
+		return new Promise((resolve, reject) => {
 			fs.writeFile(path, this.#packData(data), error => {
 				if (error) {
 					console.log(error);
+					reject();
 				} else {
 					console.log(`File ${path} has been successfully written`);
+					resolve();
 				}
 			})
 		})

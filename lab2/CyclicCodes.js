@@ -1,6 +1,9 @@
 import math from "mathjs";
 import {bitArrayToString, stringToBitArray} from "./Converters.js";
 
+/**
+ * format of number[]: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
+ */
 export class CyclicCodes {
 
 	/**
@@ -18,7 +21,6 @@ export class CyclicCodes {
 	}
 
 	/**
-	 * format: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
 	 * @param a: number[]
 	 * @returns number[]
 	 */
@@ -29,7 +31,28 @@ export class CyclicCodes {
 	}
 
 	/**
-	 * format: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
+	 * @param a: number[]
+	 * @returns number[]
+	 */
+	decode(a) {
+		let result;
+		let remainder = this.findRemainder(a);
+		console.log("Decode remainder", bitArrayToString(remainder));
+		if (remainder.every((value => value === 0))) {
+			result = a.slice(this.k + 1);
+		} else {
+			remainder = remainder.slice(0, this.n);
+			const error = this.syndromeTable[bitArrayToString(remainder)];
+			if (!error) {
+				throw new Error("Unable to decode this message: " + bitArrayToString(a));
+			}
+			result = CyclicCodes.#xor(a, stringToBitArray(error)).slice(this.k + 1);
+		}
+
+		return result;
+	}
+
+	/**
 	 * @param c: number[]
 	 * @returns number[]
 	 */
@@ -39,7 +62,6 @@ export class CyclicCodes {
 	}
 
 	/**
-	 * format: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
 	 * @param a: number[]
 	 * @returns number[]
 	 */
@@ -69,7 +91,6 @@ export class CyclicCodes {
 	}
 
 	/**
-	 * format: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
 	 * @param dividend: number[]
 	 * @param divisor: number[]
 	 * @returns {{quotient: number[], remainder: number[]}}
@@ -92,7 +113,6 @@ export class CyclicCodes {
 	}
 
 	/**
-	 * format: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
 	 * @param a: number[]
 	 * @param b: number[]
 	 * @returns {number[]}
@@ -118,5 +138,20 @@ export class CyclicCodes {
 	 */
 	static #hammingWeight(code) {
 		return code.toString(2).replace(/0/g, "").length;
+	}
+
+	/**
+	 * @param a: number[]
+	 * @param b: number[]
+	 * @returns {number[]}
+	 */
+	static #xor(a, b) {
+		let longest = a.length < b.length ? b : a;
+		let shortest = a.length < b.length ? a : b;
+
+		/* make equal lengths */
+		shortest = shortest.concat(new Array(longest.length - shortest.length).fill(0));
+
+		return math.xor(longest, shortest).map(value => value ? 1 : 0);
 	}
 }
