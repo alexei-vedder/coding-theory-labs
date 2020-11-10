@@ -60,7 +60,9 @@ export class CyclicCodes {
 				const c = stringToBitArray(error.toString(2));
 				c.unshift(...new Array(this.n - c.length).fill(0));
 				const syndrome = bitArrayToString(this.findRemainder(c));
-				syndromes[syndrome] = error.toString(2);
+				let errorAsBitString = error.toString(2);
+				errorAsBitString = "0".repeat(this.n - errorAsBitString.length) + errorAsBitString;
+				syndromes[syndrome] = errorAsBitString;
 			}
 		}
 		return syndromes;

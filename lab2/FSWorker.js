@@ -1,8 +1,8 @@
 import fs from "fs";
 
 export class FSWorker {
- 	readDataFromFile(path) {}
-	writeDataToFile(data, path) {}
+ 	async readDataFromFile(path) {}
+	async writeDataToFile(data, path) {}
 }
 
 export class JSONFileWorker extends FSWorker {
@@ -13,7 +13,7 @@ export class JSONFileWorker extends FSWorker {
 	 * @param path
 	 * @returns {Promise<string>}
 	 */
-	readDataFromFile(path = "temp.json") {
+	async readDataFromFile(path) {
 		return new Promise(resolve => {
 			fs.readFile(path, (error, buffer) => {
 				resolve(this.#extractData(buffer));
@@ -26,7 +26,7 @@ export class JSONFileWorker extends FSWorker {
 	 * @param path
 	 * @returns {Promise<void>}
 	 */
-	writeDataToFile(data, path = "temp-out.json") {
+	async writeDataToFile(data, path = "out.json") {
 		return new Promise(() => {
 			fs.writeFile(path, this.#packData(data), error => {
 				if (error) {
