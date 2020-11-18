@@ -55,15 +55,15 @@ const H = readMatrix(H_PATH);
 const G = readMatrix(G_PATH);
 const a = readMatrix(a_PATH);
 
-console.log("H:", H._data);
-console.log("G:", G._data);
-console.log("a:", a._data);
+console.log("H:", H.toArray());
+console.log("G:", G.toArray());
+console.log("a:", a.toArray());
 
 const c = math.mod(math.multiply(a, G), 2);
-console.log("c:", c._data);
+console.log("c:", c.toArray());
 
 const b = math.mod(math.multiply(H, math.transpose(c)), 2);
-console.log("b:", b._data);
+console.log("b:", b.toArray());
 
 /** error vector */
 const e = [[0, 0, 0, 1, 0, 0, 0]];
@@ -71,10 +71,10 @@ const e = [[0, 0, 0, 1, 0, 0, 0]];
 /*
 
 const c2 = math.add(c, e);
-console.log("c':", c2._data);
+console.log("c':", c2.toArray());
 
 const b2 = math.multiply(H, math.transpose(c2));
-console.log("b':", b2._data)
+console.log("b':", b2.toArray())
 
 */
 
