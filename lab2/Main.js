@@ -1,7 +1,7 @@
 import {CyclicCodes} from "./CyclicCodes.js";
-import {JSONFileWorker} from "./FSWorker.js";
+import {JSONFileWorker} from "../shared/FSWorker.js";
 import {FileEncoder} from "./FileEncoder.js";
-import {bitArrayToString} from "./Converters.js";
+import {bitArrayToString} from "../shared/Converters.js";
 
 const cyclicCodes = new CyclicCodes();
 

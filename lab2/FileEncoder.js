@@ -1,5 +1,5 @@
 import {CyclicCodes} from "./CyclicCodes.js";
-import {bitArrayToString, stringToBitArray} from "./Converters.js";
+import {bitArrayToString, stringToBitArray} from "../shared/Converters.js";
 
 export class FileEncoder {
 	constructor(fsWorker, k, n, g, t) {
