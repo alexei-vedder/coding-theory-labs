@@ -44,7 +44,7 @@ export class CyclicCodes {
 			remainder = remainder.slice(0, this.n);
 			const error = this.syndromeTable[bitArrayToString(remainder)];
 			if (!error) {
-				throw new Error("Unable to decode this message: " + bitArrayToString(a));
+				throw new Error("Unable to decode this message: " + bitArrayToString(a) + ". Syndrome: " + bitArrayToString(remainder));
 			}
 			result = CyclicCodes.#xor(a, stringToBitArray(error)).slice(this.k + 1);
 		}

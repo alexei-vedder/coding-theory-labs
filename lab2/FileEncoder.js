@@ -38,8 +38,12 @@ export class FileEncoder {
 
 		console.log("Data without an error:", bitArrayToString(data));
 
-		const errorElementPosition = Math.floor(data.length / 2);
-		data[errorElementPosition] = data[errorElementPosition] === 0 ? 1 : 0;
+		const errorsTotal = Math.min(this.cyclicCodes.t, data.length);
+
+		for (let i = 0; i < errorsTotal; ++i) {
+			data[i] = data[i] ? 0 : 1;
+		}
+
 		const dataWithErrorAsString = bitArrayToString(data);
 
 		console.log("Data with an error:   ", dataWithErrorAsString);
