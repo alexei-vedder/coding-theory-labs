@@ -1,6 +1,6 @@
 import math from "mathjs";
 import {hammingWeight, xor} from "../shared/MathFns.js";
-import {bitArrayToString, matrixToString} from "../shared/Converters.js";
+import {bitArrayToString, bitMatrixToString} from "../shared/Converters.js";
 
 export class GolayCode {
 	/**
@@ -18,11 +18,11 @@ export class GolayCode {
 		this.H = [...this.I.toArray(), ...this.B];
 
 		console.log("B:");
-		console.log(matrixToString(this.B));
+		console.log(bitMatrixToString(this.B));
 		console.log("G:");
-		console.log(matrixToString(this.G.toArray()));
+		console.log(bitMatrixToString(this.G.toArray()));
 		console.log("H:");
-		console.log(matrixToString(this.H));
+		console.log(bitMatrixToString(this.H));
 	}
 
 	/**
