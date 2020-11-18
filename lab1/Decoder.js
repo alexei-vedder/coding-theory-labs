@@ -22,7 +22,7 @@ export class Decoder {
 
 		return fourBitArrays
 			.flat()
-			.map(matrix => matrix._data)
+			.map(matrix => matrix.toArray())
 			.flat();
 	}
 }
