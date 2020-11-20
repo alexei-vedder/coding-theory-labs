@@ -20,8 +20,8 @@ export class FileEncoder {
 		const encodedData = this.code.encode(data);
 		const encodedDataAsString = bitArrayToString(encodedData);
 
-		console.log("Data", bitArrayToString(data));
-		console.log("Encoded data", encodedDataAsString);
+		console.log("Data:", bitArrayToString(data));
+		console.log("Encoded:", encodedDataAsString);
 
 		await this.fsWorker.writeDataToFile(encodedDataAsString, outputFilePath);
 	}
@@ -36,7 +36,7 @@ export class FileEncoder {
 		const decodedData = this.code.decode(data);
 		const decodedDataAsString = bitArrayToString(decodedData);
 
-		console.log("Decoded data", decodedDataAsString);
+		console.log("Decoded:", decodedDataAsString);
 
 		await this.fsWorker.writeDataToFile(decodedDataAsString, outputFilePath);
 	}
@@ -50,11 +50,11 @@ export class FileEncoder {
 	async injectError(filePath, errorsTotal) {
 		const data = stringToBitArray(await this.fsWorker.readDataFromFile(filePath));
 
-		console.log("Data without an error:", bitArrayToString(data));
+		console.log("Data without errors:", bitArrayToString(data));
 
 		const dataWithErrorAsString = bitArrayToString(this.code.injectError(data, errorsTotal));
 
-		console.log("Data with an error:   ", dataWithErrorAsString);
+		console.log("Data with errors:   ", dataWithErrorAsString);
 
 		await this.fsWorker.writeDataToFile(dataWithErrorAsString, filePath);
 	}
