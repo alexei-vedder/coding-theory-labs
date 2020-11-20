@@ -1,7 +1,7 @@
 import {CyclicCodes} from "./CyclicCodes.js";
 import {bitArrayToString, stringToBitArray} from "../shared/Converters.js";
 
-export class FileEncoder {
+export class CyclicCodesFileEncoder {
 	constructor(fsWorker, k, n, g, t) {
 		this.fsWorker = fsWorker;
 		this.cyclicCodes = new CyclicCodes(k, n, g, t);
