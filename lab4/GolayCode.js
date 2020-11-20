@@ -23,10 +23,6 @@ export class GolayCode extends Code {
 		];
 	}
 
-	/**
-	 * @param a {number[]}
-	 * @returns {number[]}
-	 */
 	encode(a) {
 		if (a.length === this.k) {
 			return math.multiply(a, this.G)
@@ -36,10 +32,6 @@ export class GolayCode extends Code {
 		}
 	}
 
-	/**
-	 * @param w {number[]}
-	 * @returns {number[]}
-	 */
 	decode(w) {
 		const syndrome = math.multiply(w, this.H).map(value => math.mod(value, 2));
 		const syndromeWeight = hammingWeight((bitArrayToString(syndrome)));

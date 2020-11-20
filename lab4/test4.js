@@ -11,6 +11,7 @@ console.log("G:");
 console.log(bitMatrixToString(golayCode.G));
 console.log("H:");
 console.log(bitMatrixToString(golayCode.H));
+
 const data = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
 console.log("Data:", bitArrayToString(data));
 
@@ -38,6 +39,18 @@ console.log("Decoded:", bitArrayToString(w2Decoded), "\n");
 console.log("************** 4.2 ***************\n");
 
 const rmCode = new RMCode(1, 3);
-const G = rmCode.generateG();
+console.log("k:", rmCode.k);
 console.log(`G(${rmCode.r}, ${rmCode.m}):`);
-console.log(bitMatrixToString(G))
+console.log(bitMatrixToString(rmCode.G));
+
+const dataRmCode = [1, 1, 0, 0];
+console.log("Data:", bitArrayToString(dataRmCode));
+
+const encodedRmCode = rmCode.encode(dataRmCode);
+console.log("Encoded:", bitArrayToString(encodedRmCode));
+
+const encodedRmCodeWithError = rmCode.injectError(encodedRmCode);
+console.log("Encoded with error:", bitArrayToString(encodedRmCodeWithError));
+
+const decodedRmCode = rmCode.decode(encodedRmCodeWithError);
+console.log("Decoded:", bitArrayToString(decodedRmCode), "\n");

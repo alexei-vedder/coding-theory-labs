@@ -1,12 +1,13 @@
 import math from "mathjs";
 import {bitArrayToString, stringToBitArray} from "../shared/Converters.js";
 import {dividePolynomialsWithRemainder, hammingWeight, multPolynomials, xor} from "../shared/MathFns.js";
+import {Code} from "../lab4/Code.js";
 
 /**
  * Note about the format of number[] used in this class:
  * [k0, k1, k2, ..., kn] represents k0 + k1*x + k2\*x\*\*2 + ... + kn\*x\*\*n
  */
-export class CyclicCodes {
+export class CyclicCodes extends Code {
 
 	/**
 	 * @param k {number} (integer)
@@ -15,6 +16,7 @@ export class CyclicCodes {
 	 * @param t {number} (integer)
 	 */
 	constructor(k = 4, n = 7, g = [1, 0, 1, 1], t = 1) {
+		super();
 		this.k = k;
 		this.n = n;
 		this.g = g;
@@ -22,20 +24,12 @@ export class CyclicCodes {
 		this.syndromeTable = this.generateSyndromeTable();
 	}
 
-	/**
-	 * @param a {number[]}
-	 * @returns number[]
-	 */
 	encode(a) {
 		return multPolynomials(a, this.g)
 			.slice(0, this.n)
 			.map(value => math.mod(value, 2));
 	}
 
-	/**
-	 * @param a {number[]}
-	 * @returns number[]
-	 */
 	decode(a) {
 		let result;
 		let remainder = this.findRemainder(a);

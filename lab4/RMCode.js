@@ -14,6 +14,17 @@ export class RMCode extends Code {
 		}
 		this.r = r;
 		this.m = m;
+		this.k = this.#calcK();
+		this.G = this.#generateG();
+	}
+
+	encode(a) {
+		if (a.length === this.k) {
+			return math.multiply(a, this.G)
+				.map(value => math.mod(value, 2));
+		} else {
+			throw new Error("Param 'a' should have length of " + this.k);
+		}
 	}
 
 	/**
@@ -21,7 +32,7 @@ export class RMCode extends Code {
 	 * @param m {number} integer, r <= m
 	 * @returns {number[][]}
 	 */
-	generateG(r = this.r, m = this.m) {
+	#generateG(r = this.r, m = this.m) {
 		if (r < 0 || m < r) {
 			throw new Error("Incorrect params!");
 		}
@@ -41,14 +52,14 @@ export class RMCode extends Code {
 			return [new Array(2**m).fill(1)];
 		} else if (r === m) {
 			return [
-				...this.generateG(m - 1, m),
+				...this.#generateG(m - 1, m),
 				new Array(2**m - 1).fill(0).concat(1)
 			];
 		} else {
-			const G_ = this.generateG(r, m - 1);
+			const G_ = this.#generateG(r, m - 1);
 			const rightPart = [
 				...G_,
-				...this.generateG(r - 1, m - 1)
+				...this.#generateG(r - 1, m - 1)
 			];
 			const leftPart = [
 				...G_,
@@ -59,5 +70,12 @@ export class RMCode extends Code {
 			return G;
 		}
 	}
-}
 
+	#calcK() {
+		let k = 0;
+		for (let i = 0; i <= this.r; ++i) {
+			k += math.combinations(this.m, i);
+		}
+		return k;
+	}
+}

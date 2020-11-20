@@ -1,50 +1,45 @@
-import {CyclicCodes} from "./CyclicCodes.js";
 import {bitArrayToString, stringToBitArray} from "../shared/Converters.js";
+import {FileEncoder} from "../lab4/FileEncoder.js";
 
-export class CyclicCodesFileEncoder {
-	constructor(fsWorker, k, n, g, t) {
-		this.fsWorker = fsWorker;
-		this.cyclicCodes = new CyclicCodes(k, n, g, t);
+export class CyclicCodesFileEncoder extends FileEncoder {
+
+	/**
+	 * @param fsWorker {FSWorker}
+	 * @param cyclicCodes {CyclicCodes}
+	 */
+	constructor(fsWorker, cyclicCodes) {
+		super(fsWorker, cyclicCodes)
 	}
 
 	/**
-	 * @param inputFilePath
-	 * @param outputFilePath
+	 * @param inputFilePath {string}
+	 * @param outputFilePath {string}
+	 * @returns {Promise<void>}
 	 */
-	async encodeFile(inputFilePath, outputFilePath) {
+	async encodeSysFile(inputFilePath, outputFilePath) {
 		const data = stringToBitArray(await this.fsWorker.readDataFromFile(inputFilePath));
-		const encodedData = this.cyclicCodes.encodeSys(data);
+		const encodedData = this.code.encodeSys(data);
 		const encodedDataAsString = bitArrayToString(encodedData);
 
 		console.log("Data", bitArrayToString(data));
-		console.log("Syndrome table", this.cyclicCodes.syndromeTable);
+		console.log("Syndrome table", this.code.syndromeTable);
 		console.log("Encoded data", encodedDataAsString);
 
 		await this.fsWorker.writeDataToFile(encodedDataAsString, outputFilePath);
 	}
 
-	async decodeFile(inputFilePath, outputFilePath) {
-		const data = stringToBitArray(await this.fsWorker.readDataFromFile(inputFilePath));
-		const decodedData = this.cyclicCodes.decode(data);
-		const decodedDataAsString = bitArrayToString(decodedData);
-
-		console.log("Decoded data", decodedDataAsString);
-
-		await this.fsWorker.writeDataToFile(decodedDataAsString, outputFilePath);
-	}
-
-	async injectError(filePath) {
+	/**
+	 * @param filePath {string}
+	 * @param errorsTotal {number}
+	 * @returns {Promise<void>}
+	 */
+	async injectError(filePath, errorsTotal) {
 		const data = stringToBitArray(await this.fsWorker.readDataFromFile(filePath));
 
 		console.log("Data without an error:", bitArrayToString(data));
 
-		const errorsTotal = Math.min(this.cyclicCodes.t, data.length);
-
-		for (let i = 0; i < errorsTotal; ++i) {
-			data[i] = data[i] ? 0 : 1;
-		}
-
-		const dataWithErrorAsString = bitArrayToString(data);
+		errorsTotal = errorsTotal ? errorsTotal : Math.min(this.code.t, data.length);
+		const dataWithErrorAsString = bitArrayToString(this.code.injectError(data, errorsTotal));
 
 		console.log("Data with an error:   ", dataWithErrorAsString);
 
