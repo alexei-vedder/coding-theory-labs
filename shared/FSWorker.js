@@ -48,6 +48,10 @@ export class JSONFileWorker extends FSWorker {
 		return JSON.parse(buffer).data;
 	}
 
+	/**
+	 * @param data {any}
+	 * @returns {string}
+	 */
 	#packData(data) {
 		return JSON.stringify({data});
 	}

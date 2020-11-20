@@ -64,3 +64,14 @@ export function xor(a, b) {
 
 	return math.xor(longest, shortest).map(value => value ? 1 : 0);
 }
+
+/**
+ * Retrieve the array key corresponding to the largest element in the array.
+ * @param array {number[]}
+ * @returns {number}
+ */
+export function argMax(array) {
+	return array
+		.map((value, index) => [value, index])
+		.reduce((biggest, current) => biggest[0] < current[0] ? current : biggest)[1];
+}

@@ -1,5 +1,7 @@
 import math from "mathjs";
 import {Code} from "./Code.js";
+import {argMax} from "../shared/MathFns.js";
+import {stringToBitArray} from "../shared/Converters.js";
 
 export class RMCode extends Code {
 
@@ -25,6 +27,19 @@ export class RMCode extends Code {
 		} else {
 			throw new Error("Param 'a' should have length of " + this.k);
 		}
+	}
+
+	decode(w) {
+		const w_ = w.map(value => value === 1 ? 1 : -1);
+		let wi = math.multiply(w_, this.#calcH(this.m, 1));
+		for (let i = 2; i <= this.m; ++i) {
+			wi = math.multiply(wi, this.#calcH(this.m, i));
+		}
+		const wm = wi;
+		const j = argMax(math.abs(wm));
+		const v = stringToBitArray(j.toString(2)).reverse();
+		v.push(...new Array(this.m - v.length).fill(0));
+		return 0 < wm[j] ? [1].concat(...v) : [0].concat(...v);
 	}
 
 	/**
@@ -77,5 +92,12 @@ export class RMCode extends Code {
 			k += math.combinations(this.m, i);
 		}
 		return k;
+	}
+
+	#calcH(m, i) {
+		const I1 = math.diag(math.ones(2**(m - i))).toArray();
+		const H = [[1, 1], [1, -1]];
+		const I2 = math.diag(math.ones(2**(i - 1))).toArray();
+		return math.kron(math.kron(I1, H), I2);
 	}
 }
