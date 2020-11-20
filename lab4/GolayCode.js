@@ -1,8 +1,9 @@
 import math from "mathjs";
 import {hammingWeight, xor} from "../shared/MathFns.js";
-import {bitArrayToString, bitMatrixToString} from "../shared/Converters.js";
+import {bitArrayToString} from "../shared/Converters.js";
+import {Code} from "./Code.js";
 
-export class GolayCode {
+export class GolayCode extends Code {
 	/**
 	 *
 	 * @param k {number}
@@ -10,31 +11,26 @@ export class GolayCode {
 	 * @param B {number[][]}
 	 */
 	constructor(k = 12, n = 24, B) {
+		super();
 		this.k = k;
 		this.n = n;
 		this.B = B ? B : this.#generateB();
-		this.I = math.diag(math.ones(this.k));
+		this.I = math.diag(math.ones(this.k)).toArray();
 		this.G = math.concat(this.I, this.B);
-		this.H = [...this.I.toArray(), ...this.B];
-
-		console.log("B:");
-		console.log(bitMatrixToString(this.B));
-		console.log("G:");
-		console.log(bitMatrixToString(this.G.toArray()));
-		console.log("H:");
-		console.log(bitMatrixToString(this.H));
+		this.H = [
+			...this.I,
+			...this.B
+		];
 	}
 
 	/**
-	 *
 	 * @param a {number[]}
 	 * @returns {number[]}
 	 */
 	encode(a) {
 		if (a.length === this.k) {
 			return math.multiply(a, this.G)
-				.map(value => math.mod(value, 2))
-				.toArray();
+				.map(value => math.mod(value, 2));
 		} else {
 			throw new Error("Param 'a' should have length of " + this.k);
 		}
@@ -71,14 +67,6 @@ export class GolayCode {
 		return u ? xor(w, u).slice(0, this.k) : (() => {throw new Error("u is not found :(")})();
 	}
 
-	injectError(encodedData, errorsTotal = 1) {
-		const encodedDataWithError = [...encodedData];
-		for (let i = 0; i < errorsTotal; ++i) {
-			encodedDataWithError[i] = encodedData[i] ? 0 : 1;
-		}
-		return encodedDataWithError;
-	}
-
 	/**
 	 * @returns {number[][]}
 	 */
@@ -111,8 +99,8 @@ export class GolayCode {
 			const weight = hammingWeight(bitArrayToString(sPlusBi));
 			if (weight <= 2) {
 				switch (concatOption) {
-					case "ei_last": return [...sPlusBi, ...this.I.toArray()[i]];
-					case "ei_first": return [...this.I.toArray()[i], ...sPlusBi];
+					case "ei_last": return [...sPlusBi, ...this.I[i]];
+					case "ei_first": return [...this.I[i], ...sPlusBi];
 					default: return null;
 				}
 			}

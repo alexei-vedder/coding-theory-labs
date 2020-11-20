@@ -1,12 +1,14 @@
 import math from "mathjs";
+import {Code} from "./Code.js";
 
-export class RMCode {
+export class RMCode extends Code {
 
 	/**
 	 * @param r {number} integer, 0 <= r
 	 * @param m {number} integer, r <= m
 	 */
 	constructor(r, m) {
+		super();
 		if (r < 0 || m < r) {
 			throw new Error("Incorrect params!");
 		}
