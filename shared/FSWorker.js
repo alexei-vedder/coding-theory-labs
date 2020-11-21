@@ -16,6 +16,7 @@ export class JSONFileWorker extends FSWorker {
 	async readDataFromFile(path) {
 		return new Promise(resolve => {
 			fs.readFile(path, (error, buffer) => {
+				console.log(`File ${path} has been successfully read`);
 				resolve(this.#extractData(buffer));
 			});
 		});
@@ -48,6 +49,10 @@ export class JSONFileWorker extends FSWorker {
 		return JSON.parse(buffer).data;
 	}
 
+	/**
+	 * @param data {any}
+	 * @returns {string}
+	 */
 	#packData(data) {
 		return JSON.stringify({data});
 	}

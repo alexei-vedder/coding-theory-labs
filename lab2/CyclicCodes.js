@@ -1,18 +1,22 @@
 import math from "mathjs";
-import {bitArrayToString, stringToBitArray} from "./Converters.js";
+import {bitArrayToString, stringToBitArray} from "../shared/Converters.js";
+import {dividePolynomialsWithRemainder, hammingWeight, multPolynomials, xor} from "../shared/MathFns.js";
+import {Code} from "../lab4/Code.js";
 
 /**
- * format of number[]: [k0, k1, k2, ..., kn] represents k0 + k1*x + k2*x**2 + ... + kn*x**n
+ * Note about the format of number[] used in this class:
+ * [k0, k1, k2, ..., kn] represents k0 + k1*x + k2\*x\*\*2 + ... + kn\*x\*\*n
  */
-export class CyclicCodes {
+export class CyclicCodes extends Code {
 
 	/**
-	 * @param k: number (integer)
-	 * @param n: number (integer)
-	 * @param g: number[] (integer)
-	 * @param t: number (integer)
+	 * @param k {number} (integer)
+	 * @param n {number} (integer)
+	 * @param g {number[]} (integer)
+	 * @param t {number} (integer)
 	 */
 	constructor(k = 4, n = 7, g = [1, 0, 1, 1], t = 1) {
+		super();
 		this.k = k;
 		this.n = n;
 		this.g = g;
@@ -20,20 +24,12 @@ export class CyclicCodes {
 		this.syndromeTable = this.generateSyndromeTable();
 	}
 
-	/**
-	 * @param a: number[]
-	 * @returns number[]
-	 */
 	encode(a) {
-		return CyclicCodes.#multPolynomials(a, this.g)
+		return multPolynomials(a, this.g)
 			.slice(0, this.n)
 			.map(value => math.mod(value, 2));
 	}
 
-	/**
-	 * @param a: number[]
-	 * @returns number[]
-	 */
 	decode(a) {
 		let result;
 		let remainder = this.findRemainder(a);
@@ -46,23 +42,23 @@ export class CyclicCodes {
 			if (!error) {
 				throw new Error("Unable to decode this message: " + bitArrayToString(a) + ". Syndrome: " + bitArrayToString(remainder));
 			}
-			result = CyclicCodes.#xor(a, stringToBitArray(error)).slice(this.k + 1);
+			result = xor(a, stringToBitArray(error)).slice(this.k + 1);
 		}
 
 		return result;
 	}
 
 	/**
-	 * @param c: number[]
+	 * @param c {number[]}
 	 * @returns number[]
 	 */
 	findRemainder(c) {
-		return CyclicCodes.#dividePolynomialsWithRemainder(c, this.g).remainder
+		return dividePolynomialsWithRemainder(c, this.g).remainder
 			.map(value => math.mod(value, 2));
 	}
 
 	/**
-	 * @param a: number[]
+	 * @param a {number[]}
 	 * @returns number[]
 	 */
 	encodeSys(a) {
@@ -78,7 +74,7 @@ export class CyclicCodes {
 	generateSyndromeTable() {
 		const syndromes = {};
 		for (let error = 0; error < math.pow(2, this.n); ++error) {
-			if (CyclicCodes.#hammingWeight(error) <= this.t) {
+			if (hammingWeight(error.toString(2)) <= this.t) {
 				const c = stringToBitArray(error.toString(2));
 				c.unshift(...new Array(this.n - c.length).fill(0));
 				const syndrome = bitArrayToString(this.findRemainder(c));
@@ -88,70 +84,5 @@ export class CyclicCodes {
 			}
 		}
 		return syndromes;
-	}
-
-	/**
-	 * @param dividend: number[]
-	 * @param divisor: number[]
-	 * @returns {{quotient: number[], remainder: number[]}}
-	 */
-	static #dividePolynomialsWithRemainder(dividend, divisor) {
-		const remainder = [...dividend];
-		const quotientLength = dividend.length - divisor.length + 1;
-		if (quotientLength < 1) {
-			return {quotient: [0], remainder};
-		}
-		const quotient = new Array(quotientLength);
-		for (let i = 0; i < quotient.length; ++i) {
-			let coeff = remainder[remainder.length - i - 1] / divisor[divisor.length - 1];
-			quotient[quotient.length - i - 1] = coeff;
-			for (let j = 0; j < divisor.length; ++j) {
-				remainder[remainder.length - i - j - 1] -= coeff * divisor[divisor.length - j - 1];
-			}
-		}
-		return {quotient, remainder};
-	}
-
-	/**
-	 * @param a: number[]
-	 * @param b: number[]
-	 * @returns {number[]}
-	 */
-	static #multPolynomials(a, b) {
-		const R = (a.length - 1) * (b.length - 1);
-		const result = new Array(R).fill(0);
-
-		for (let i = 0; i < a.length; ++i) {
-			for (let j = 0; j < b.length; ++j) {
-				if (i + j < R) {
-					result[i + j] += a[i] * b[j];
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * @param code: number (integer)
-	 * @returns {number} (integer)
-	 */
-	static #hammingWeight(code) {
-		return code.toString(2).replace(/0/g, "").length;
-	}
-
-	/**
-	 * @param a: number[]
-	 * @param b: number[]
-	 * @returns {number[]}
-	 */
-	static #xor(a, b) {
-		let longest = a.length < b.length ? b : a;
-		let shortest = a.length < b.length ? a : b;
-
-		/* make equal lengths */
-		shortest = shortest.concat(new Array(longest.length - shortest.length).fill(0));
-
-		return math.xor(longest, shortest).map(value => value ? 1 : 0);
 	}
 }
