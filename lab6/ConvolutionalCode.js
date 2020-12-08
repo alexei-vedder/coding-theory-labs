@@ -12,183 +12,59 @@ export class ConvolutionalCode extends Code {
 			return Array.from(Array(Math.ceil(this.length / n)), (_, i) => this.slice(i * n, i * n + n));
 		}
 
-		/*
-		this.diagram2 = new Map([
-			[{state: [0, 0, 0], input: [0]}, {state: [0, 0, 0], output: [0, 0]}],
-			[{state: [0, 0, 0], input: [0]}, {state: [1, 0, 0], output: [1, 1]}],
-			[{state: [0, 0, 0], input: [1]}, {state: [0, 0, 0], output: [0, 0]}],
-			[{state: [0, 0, 0], input: [1]}, {state: [1, 0, 0], output: [1, 1]}],
+		if (n === 2 && m === 3) {
+			this.diagram = [
+				[{state: [0, 0, 0], input: [0]},
+					{state: [0, 0, 0], output: [0, 0]}],
 
-			[{state: [1, 0, 0], input: [1]}, {state: [1, 1, 0], output: [0, 1]}],
-			[{state: [1, 0, 0], input: [1]}, {state: [0, 1, 0], output: [1, 0]}],
-			[{state: [1, 0, 0], input: [0]}, {state: [1, 1, 0], output: [0, 1]}],
-			[{state: [1, 0, 0], input: [0]}, {state: [0, 1, 0], output: [1, 0]}],
+				[{state: [0, 0, 0], input: [1]},
+					{state: [1, 0, 0], output: [1, 1]}],
 
-			[{state: [1, 1, 0], input: [0]}, {state: [1, 1, 1], output: [0, 0]}],
-			[{state: [1, 1, 0], input: [0]}, {state: [0, 1, 1], output: [1, 1]}],
-			[{state: [1, 1, 0], input: [1]}, {state: [1, 1, 1], output: [0, 0]}],
-			[{state: [1, 1, 0], input: [1]}, {state: [0, 1, 1], output: [1, 1]}],
+				[{state: [1, 0, 0], input: [1]},
+					{state: [1, 1, 0], output: [0, 1]}],
 
-			[{state: [1, 1, 1], input: [0]}, {state: [1, 1, 1], output: [1, 1]}],
-			[{state: [1, 1, 1], input: [0]}, {state: [0, 1, 1], output: [0, 0]}],
-			[{state: [1, 1, 1], input: [1]}, {state: [1, 1, 1], output: [1, 1]}],
-			[{state: [1, 1, 1], input: [1]}, {state: [0, 1, 1], output: [0, 0]}],
+				[{state: [1, 0, 0], input: [0]},
+					{state: [0, 1, 0], output: [1, 0]}],
 
-			[{state: [0, 1, 1], input: [0]}, {state: [1, 0, 1], output: [0, 1]}],
-			[{state: [0, 1, 1], input: [0]}, {state: [0, 0, 1], output: [1, 0]}],
-			[{state: [0, 1, 1], input: [1]}, {state: [1, 0, 1], output: [0, 1]}],
-			[{state: [0, 1, 1], input: [1]}, {state: [0, 0, 1], output: [1, 0]}],
+				[{state: [1, 1, 0], input: [0]},
+					{state: [0, 1, 1], output: [1, 1]}],
 
-			[{state: [0, 0, 1], input: [1]}, {state: [1, 0, 0], output: [0, 0]}],
-			[{state: [0, 0, 1], input: [1]}, {state: [0, 0, 0], output: [1, 1]}],
-			[{state: [0, 0, 1], input: [0]}, {state: [1, 0, 0], output: [0, 0]}],
-			[{state: [0, 0, 1], input: [0]}, {state: [0, 0, 0], output: [1, 1]}],
+				[{state: [1, 1, 0], input: [1]},
+					{state: [1, 1, 1], output: [0, 0]}],
 
-			[{state: [0, 1, 0], input: [1]}, {state: [0, 0, 1], output: [0, 1]}],
-			[{state: [0, 1, 0], input: [1]}, {state: [1, 0, 1], output: [1, 0]}],
-			[{state: [0, 1, 0], input: [0]}, {state: [0, 0, 1], output: [0, 1]}],
-			[{state: [0, 1, 0], input: [0]}, {state: [1, 0, 1], output: [1, 0]}],
+				[{state: [1, 1, 1], input: [0]},
+					{state: [0, 1, 1], output: [0, 0]}],
 
-			[{state: [1, 0, 1], input: [1]}, {state: [1, 1, 0], output: [1, 0]}],
-			[{state: [1, 0, 1], input: [1]}, {state: [0, 1, 0], output: [0, 1]}],
-			[{state: [1, 0, 1], input: [0]}, {state: [1, 1, 0], output: [1, 0]}],
-			[{state: [1, 0, 1], input: [0]}, {state: [0, 1, 0], output: [0, 1]}]
-		])
+				[{state: [1, 1, 1], input: [1]},
+					{state: [1, 1, 1], output: [1, 1]}],
 
-		this.diagram3 = new Map([
+				[{state: [0, 1, 1], input: [0]},
+					{state: [0, 0, 1], output: [1, 0]}],
 
-			[{state: [0, 0, 0], input: [0]}, [
-				{state: [0, 0, 0], output: [0, 0]},
-				//{state: [1, 0, 0], output: [1, 1]}
-			]],
+				[{state: [0, 1, 1], input: [1]},
+					{state: [1, 0, 1], output: [0, 1]}],
 
-			[{state: [0, 0, 0], input: [1]}, [
-				//{state: [0, 0, 0], output: [0, 0]},
-				{state: [1, 0, 0], output: [1, 1]}
-			]],
+				[{state: [0, 0, 1], input: [1]},
+					{state: [1, 0, 0], output: [0, 0]}],
 
-			[{state: [1, 0, 0], input: [1]}, [
-				//{state: [1, 1, 0], output: [0, 1]},
-				{state: [0, 1, 0], output: [1, 0]}
-			]],
+				[{state: [0, 0, 1], input: [0]},
+					{state: [0, 0, 0], output: [1, 1]}],
 
-			[{state: [1, 0, 0], input: [0]}, [
-				{state: [1, 1, 0], output: [0, 1]},
-				//{state: [0, 1, 0], output: [1, 0]}
-			]],
+				[{state: [0, 1, 0], input: [1]},
+					{state: [1, 0, 1], output: [1, 0]}],
 
-			[{state: [1, 1, 0], input: [0]}, [
-				{state: [1, 1, 1], output: [0, 0]},
-				//{state: [0, 1, 1], output: [1, 1]}
-			]],
+				[{state: [0, 1, 0], input: [0]},
+					{state: [0, 0, 1], output: [0, 1]}],
 
-			[{state: [1, 1, 0], input: [1]}, [
-				{state: [1, 1, 1], output: [0, 0]},
-				{state: [0, 1, 1], output: [1, 1]}
-			]],
+				[{state: [1, 0, 1], input: [1]},
+					{state: [1, 1, 0], output: [1, 0]}],
 
-			[{state: [1, 1, 1], input: [0]}, [
-				{state: [1, 1, 1], output: [1, 1]},
-				{state: [0, 1, 1], output: [0, 0]}
-			]],
-
-			[{state: [1, 1, 1], input: [1]}, [
-				{state: [1, 1, 1], output: [1, 1]},
-				{state: [0, 1, 1], output: [0, 0]}
-			]],
-
-			[{state: [0, 1, 1], input: [0]}, [
-				{state: [1, 0, 1], output: [0, 1]},
-				{state: [0, 0, 1], output: [1, 0]}
-			]],
-
-			[{state: [0, 1, 1], input: [1]}, [
-				{state: [1, 0, 1], output: [0, 1]},
-				{state: [0, 0, 1], output: [1, 0]}
-			]],
-
-			[{state: [0, 0, 1], input: [1]}, [
-				{state: [1, 0, 0], output: [0, 0]},
-				{state: [0, 0, 0], output: [1, 1]}
-			]],
-
-			[{state: [0, 0, 1], input: [0]}, [
-				{state: [1, 0, 0], output: [0, 0]},
-				{state: [0, 0, 0], output: [1, 1]}
-			]],
-
-			[{state: [0, 1, 0], input: [1]}, [
-				{state: [0, 0, 1], output: [0, 1]},
-				{state: [1, 0, 1], output: [1, 0]}
-			]],
-
-			[{state: [0, 1, 0], input: [0]}, [
-				{state: [0, 0, 1], output: [0, 1]},
-				{state: [1, 0, 1], output: [1, 0]}
-			]],
-
-			[{state: [1, 0, 1], input: [1]}, [
-				{state: [1, 1, 0], output: [1, 0]},
-				{state: [0, 1, 0], output: [0, 1]}
-			]],
-
-			[{state: [1, 0, 1], input: [0]}, [
-				{state: [1, 1, 0], output: [1, 0]},
-				{state: [0, 1, 0], output: [0, 1]}
-			]],
-		])
-		*/
-
-
-		this.diagram = [
-			[{state: [0, 0, 0], input: [0]},
-				{state: [0, 0, 0], output: [0, 0]}],
-
-			[{state: [0, 0, 0], input: [1]},
-				{state: [1, 0, 0], output: [1, 1]}],
-
-			[{state: [1, 0, 0], input: [1]},
-				{state: [1, 1, 0], output: [0, 1]}],
-
-			[{state: [1, 0, 0], input: [0]},
-				{state: [0, 1, 0], output: [1, 0]}],
-
-			[{state: [1, 1, 0], input: [0]},
-				{state: [0, 1, 1], output: [1, 1]}],
-
-			[{state: [1, 1, 0], input: [1]},
-				{state: [1, 1, 1], output: [0, 0]}],
-
-			[{state: [1, 1, 1], input: [0]},
-				{state: [0, 1, 1], output: [0, 0]}],
-
-			[{state: [1, 1, 1], input: [1]},
-				{state: [1, 1, 1], output: [1, 1]}],
-
-			[{state: [0, 1, 1], input: [0]},
-				{state: [0, 0, 1], output: [1, 0]}],
-
-			[{state: [0, 1, 1], input: [1]},
-				{state: [1, 0, 1], output: [0, 1]}],
-
-			[{state: [0, 0, 1], input: [1]},
-				{state: [1, 0, 0], output: [0, 0]}],
-
-			[{state: [0, 0, 1], input: [0]},
-				{state: [0, 0, 0], output: [1, 1]}],
-
-			[{state: [0, 1, 0], input: [1]},
-				{state: [1, 0, 1], output: [1, 0]}],
-
-			[{state: [0, 1, 0], input: [0]},
-				{state: [0, 0, 1], output: [0, 1]}],
-
-			[{state: [1, 0, 1], input: [1]},
-				{state: [1, 1, 0], output: [1, 0]}],
-
-			[{state: [1, 0, 1], input: [0]},
-				{state: [0, 1, 0], output: [0, 1]}],
-		]
+				[{state: [1, 0, 1], input: [0]},
+					{state: [0, 1, 0], output: [0, 1]}],
+			]
+		} else {
+			throw new Error("Cannot handle input params")
+		}
 	}
 
 	encode(a) {
