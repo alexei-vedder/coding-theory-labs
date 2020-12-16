@@ -16,3 +16,7 @@ console.log("\n************** 6.3 ***************\n");
 const decoded = convCode.decode(encoded);
 
 console.log("\nDecoded", bitArrayToString(decoded));
+
+console.log("\n************** 6.4 ***************\n");
+
+const decodedViterbi = convCode.decodeViterbi(encoded);
