@@ -12,10 +12,6 @@ export class ConvolutionalCode extends Code {
 			return Array.from(Array(Math.ceil(this.length / n)), (_, i) => this.slice(i * n, i * n + n));
 		}
 
-		Array.prototype.last = function () {
-			return this[this.length - 1];
-		}
-
 		if (n === 2 && m === 3) {
 			this.diagram = {
 				states: [
@@ -142,89 +138,120 @@ export class ConvolutionalCode extends Code {
 	decodeViterbi(w) {
 		const chunks = w.chunk(this.n);
 		let t = 0;
-		const ways = [];
+		let wayObjects = [];
 
 		for (let state of this.diagram.states) {
-			ways.push({
-				states: this.#findStateChain(stringToBitArray(state)),
+			wayObjects.push({
+				way: this.#findWay(stringToBitArray(state))
 			})
 		}
 
 		t = this.m;
 
-		ways.forEach(way => {
+		wayObjects.forEach(way => {
 			way.distance = this.#calcDistance(
 				w.join("").slice(0, this.m * this.n),
-				this.#extractEncodedMessageFromPath(way.states)
+				this.#extractEncodedMessageFromWay(way.way)
 			);
 		});
 
-		console.log("WAYS", ways);
+		console.log(`WAYS (t=${t})`, wayObjects);
 
-		const newWays = [];
+		for (t++; t <= chunks.length; t++) {
+			const newWayObjects = [];
 
-		t++;
+			for (let newState of this.diagram.states) {
+				const state0 = newState.slice(1) + "0";
+				const state1 = newState.slice(1) + "1";
 
-		for (let newState of this.diagram.states) {
-			const state0 = newState.slice(1) + "0";
-			const state1 = newState.slice(1) + "1";
+				const way0 = wayObjects.find(wayObj => wayObj.way.slice(0, this.m) === state0);
+				const way1 = wayObjects.find(wayObj => wayObj.way.slice(0, this.m) === state1);
 
-			const way0 = ways.find(path => path.states.last() === state0);
-			const way1 = ways.find(path => path.states.last() === state1);
+				const distance0 = way0.distance + this.#calcDistance(
+					chunks[t - 1].join(""),
+					this.diagram.edges
+						.find(edge => edge.from === state0 && edge.to === newState)
+						.output
+				);
+				const distance1 = way1.distance + this.#calcDistance(
+					chunks[t - 1].join(""),
+					this.diagram.edges
+						.find(edge => edge.from === state1 && edge.to === newState)
+						.output
+				);
 
-			const distance0 = way0.distance + this.#calcDistance(
-				chunks[t - 1].join(""),
-				this.diagram.edges.find(edge => edge.from === state0 && edge.to === newState).output
-			);
-			const distance1 = way1.distance + this.#calcDistance(
-				chunks[t - 1].join(""),
-				this.diagram.edges.find(edge => edge.from === state1 && edge.to === newState).output
-			);
+				let newWayObject;
 
-			let newWay;
-
-			if (distance0 < distance1) {
-				newWay = {
-					states: [...way0.states, newState],
-					distance: distance0
+				if (distance0 < distance1) {
+					newWayObject = {
+						way: newState[0] + way0.way,
+						distance: distance0
+					}
+				} else if (distance1 < distance0) {
+					newWayObject = {
+						way: newState[0] + way1.way,
+						distance: distance1
+					}
+				} else if (distance0 === distance1) {
+					let way = newState[0];
+					for (let i = 0; i < way0.way.length; ++i) {
+						way += way0.way[i] === way1.way[i] ? way0.way[i] : "*";
+					}
+					newWayObject = {
+						way,
+						distance: distance0
+					}
 				}
-			} else if (distance1 < distance0) {
-				newWay = {
-					states: [...way1.states, newState],
-					distance: distance1
-				}
-			} else {
-				throw new Error("distances are equal, dunno what to do");
+
+				newWayObjects.push(newWayObject);
 			}
 
-			newWays.push(newWay);
+			console.log(`WAYS (t=${t})`, newWayObjects);
+
+			wayObjects = newWayObjects;
 		}
 
-		console.log("NEW WAYS", newWays);
+		const shortestWay = wayObjects
+			.reduce((shortest, wayObj) => (shortest.distance < wayObj.distance) ? shortest : wayObj, wayObjects[0])
+			.way;
+
+		console.log("Shortest way:", shortestWay);
+
+		return this.decode(stringToBitArray(this.#extractEncodedMessageFromWay(shortestWay)));
 	}
 
-	#extractEncodedMessageFromPath(states) {
+	/**
+	 * @param way {string}
+	 * @returns {string}
+	 */
+	#extractEncodedMessageFromWay(way) {
 		let encoded = "";
-		for (let i = 1; i < states.length; ++i) {
-			encoded += this.diagram.edges.find(edge => edge.from === states[i - 1] && edge.to === states[i]).output;
+		for (let i = 0; i < way.length - this.m; ++i) {
+			const from = i === 0 ? way.slice(-this.m - i) : way.slice(-this.m - i, -i);
+			const to = way.slice(-this.m - i - 1, -i - 1);
+			encoded += this.diagram.edges
+				.find(edge => edge.from === from &&
+					edge.to === to).output;
 		}
 		return encoded;
 	}
 
-	#findStateChain(endState) {
+	/**
+	 * @param endState {number[]}
+	 * @returns {string}
+	 */
+	#findWay(endState) {
 		let state = "000";
 		return endState.reduce((result, bit) => {
-			const nextState = (bit + state).slice(0, 3);
-			result.push(nextState);
-			state = nextState;
-			return result;
-		}, [state]);
+			state = (bit + state).slice(0, 3);
+			return state[0] + result;
+		}, state);
 	}
 
 	/**
 	 *
-	 * @param a {(string | number)[]}
-	 * @param b {(string | number)[]}
+	 * @param a {string | number[]}
+	 * @param b {string | number[]}
 	 * @returns {number}
 	 */
 	#calcDistance(a, b) {

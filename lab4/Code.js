@@ -22,7 +22,7 @@ export class Code {
 	 */
 	injectError(encodedData, errorsTotal = 1) {
 		const encodedDataWithError = [...encodedData];
-		for (let i = 0; i < errorsTotal; ++i) {
+		for (let i = 0; i < errorsTotal * errorsTotal; i += errorsTotal) {
 			encodedDataWithError[i] = encodedData[i] ? 0 : 1;
 		}
 		return encodedDataWithError;

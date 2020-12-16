@@ -3,7 +3,7 @@
  * @returns {string}
  */
 export function bitArrayToString(bitArray) {
-	return bitArray ? bitArray.reduce((str, value) => str.concat(value.toString()), "") : ""; // return bitArray.join("");
+	return bitArray.join("");
 }
 
 /**
