@@ -113,10 +113,18 @@ export class ConvolutionalCode extends Code {
 	}
 
 	encode(a) {
+		console.log("Encoding started");
+
 		let state = "000";
-		return a.reduce((result, bit) => {
+		return a.reduce((result, bit, index) => {
+
+			console.log(`State(${index}):`, state);
+
 			const nextState = (bit + state).slice(0, 3);
-			const output = this.diagram.edges.find(edge => edge.from === state && edge.to === nextState).output;
+			const output = this.diagram.edges
+				.find(edge => edge.from === state && edge.to === nextState)
+				.output;
+
 			result.push(...stringToBitArray(output));
 			state = nextState;
 			return result;
@@ -124,9 +132,14 @@ export class ConvolutionalCode extends Code {
 	}
 
 	decode(w) {
+		console.log("Decoding started");
+
 		let state = "000";
 		const chunks = w.chunk(this.n);
-		return chunks.reduce((result, chunk) => {
+		return chunks.reduce((result, chunk, index) => {
+
+			console.log(`State(${index}):`, state)
+
 			const nextState = this.diagram.edges.find(edge => edge.from === state && edge.output === chunk.join("")).to;
 			const bit = nextState[0];
 			result.push(Number.parseInt(bit));
@@ -136,28 +149,34 @@ export class ConvolutionalCode extends Code {
 	}
 
 	decodeViterbi(w) {
+		console.log("Decoding via Viterbi started\n");
+
 		const chunks = w.chunk(this.n);
 		let t = 0;
+
+		/** @type {{ way, distance }[]} */
 		let wayObjects = [];
 
 		for (let state of this.diagram.states) {
 			wayObjects.push({
-				way: this.#findWay(stringToBitArray(state))
+				way: this.#findWay(state)
 			})
 		}
 
 		t = this.m;
 
-		wayObjects.forEach(way => {
-			way.distance = this.#calcDistance(
+		wayObjects.forEach(wayObj => {
+			wayObj.distance = this.#calcDistance(
 				w.join("").slice(0, this.m * this.n),
-				this.#extractEncodedMessageFromWay(way.way)
+				this.#extractEncodedMessageFromWay(wayObj.way)
 			);
 		});
 
 		console.log(`WAYS (t=${t})`, wayObjects);
 
 		for (t++; t <= chunks.length; t++) {
+
+			/** @type {{ way, distance }[]} */
 			const newWayObjects = [];
 
 			for (let newState of this.diagram.states) {
@@ -237,19 +256,20 @@ export class ConvolutionalCode extends Code {
 	}
 
 	/**
-	 * @param endState {number[]}
+	 * @param endState {string}
 	 * @returns {string}
 	 */
 	#findWay(endState) {
 		let state = "000";
-		return endState.reduce((result, bit) => {
+		let result = state;
+		for (let bit of endState) {
 			state = (bit + state).slice(0, 3);
-			return state[0] + result;
-		}, state);
+			result = state[0] + result;
+		}
+		return result;
 	}
 
 	/**
-	 *
 	 * @param a {string | number[]}
 	 * @param b {string | number[]}
 	 * @returns {number}
